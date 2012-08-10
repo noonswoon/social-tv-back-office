@@ -1,0 +1,69 @@
+<script>
+		$('#signUpButton').button({
+			icons: {
+				primary: "ui-icon-triangle-1-e",
+				secondary: "ui-icon-triangle-1-e"
+			}
+		});
+		
+		$('#backButton').button({
+			icons: {
+				primary: "ui-icon-triangle-1-w",
+				secondary: "ui-icon-triangle-1-w"
+			}
+		});
+		
+		$('#signUpButton').click(function() {
+			var firstName = $.trim($('#firstName').val());
+			var lastName = $.trim($('#lastName').val());
+			var mail = $.trim($('#email').val());
+			var passwd = $.trim($('#password').val());
+			var confirmPasswd = $('#confirm').val();
+			
+			createUser(mail, firstName, lastName, passwd, confirmPasswd);
+		});
+		
+		$('#backButton').click(function() {
+			window.location = 'login.html';
+		});
+	
+</script>
+<table width="100%">
+	<tr>
+		<td>First Name:</td>
+		<td>
+			<input id="firstName" class="ui-widget ui-corner-all loginInput" value="">
+		</td>
+	</tr>
+	<tr>
+		<td>Last Name:</td>
+		<td>
+			<input id="lastName" class="ui-widget ui-corner-all loginInput" value="">
+		</td>
+	</tr>
+	<tr>
+		<td>Email:</td>
+		<td>
+			<input id="email" class="ui-widget ui-corner-all loginInput" value="">
+		</td>
+	</tr>
+	<tr>
+		<td>Password:</td>
+		<td>
+			<input id="password" type="password" class="ui-widget ui-corner-all loginInput" >
+		</td>
+	</tr>
+	<tr>
+		<td>Confirm:</td>
+		<td>
+			<input id="confirm" type="password" class="ui-widget ui-corner-all loginInput" >
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td nowrap>
+			<a id="signUpButton" href="javascript:void(0)">Sign Up</a>&nbsp;
+			<a id="backButton" href="javascript:void(0)">Back</a>
+		</td>
+	</tr>
+</table>
