@@ -20,7 +20,7 @@ var sdk = new Cocoafish(acsAppKey);
 //redirectUri can also be specified when calling sdk.sendAuthRequest, sdk.signUpRequest, and sdk.invalidateTokenRequest.
 sdk.redirectUri = 'http://localhost:8000/connect.html';
 sdk.apiBaseURL = 'api.cloud.appcelerator.com';
-//sdk.apiBaseURL = 'api-staging.cloud.appcelerator.com';
+
 sdk.oauthSecret = acsOAuthSecret;
 
 // Sign up at http://cocoafish.com and create an app.
@@ -262,4 +262,100 @@ function checkinPlace(placeId) {
                 }
             });
       }
+}
+
+function loadProgramsShowingNow() {
+    var now_full = moment().format('YYYY-MM-DD,HH:mm:ss');
+    var data = {
+        where: '{"start_time":{"$lte":"'+now_full+'"},"end_time":{"$gte":"'+now_full+'"} ,"program_country":"th"}',
+        response_json_depth: 3,
+        per_page: 50
+            //event_id: '4d870f8bd0afbe1074000017'
+    };
+    
+    sdk.sendRequest('events/query/occurrences.json', 'GET', data, function(data) {
+        if(data) {
+            if(data.meta) {
+                var meta = data.meta;
+                if(meta.status == 'ok' && meta.code == 200  && meta.method_name == 'queryEventOccurrences') {
+                    var eventOccurrences = data.response.event_occurrences;
+                    //will have to iterate and build stuff here
+                    console.log(eventOccurrences);
+                    var table = document.getElementById('programsNowTable');
+                    for(var i=0; i < eventOccurrences.length; i++) {
+                        var curEvent = eventOccurrences[i];
+                        var rowCount = table.rows.length;
+                        var row = table.insertRow(rowCount);
+
+                        var cellAction = row.insertCell(0);
+                        cellAction.innerHTML = '<a href="chat.html?programId='+curEvent.event.custom_fields.program_id+'">Chat</a> <a href="board.html?programId='+curEvent.event.custom_fields.program_id+'">Board</a>';
+
+                        var cellName = row.insertCell(1);
+                        cellName.innerHTML = curEvent.event.name;
+
+                        var cellSubname = row.insertCell(2);
+                        cellSubname.innerHTML = curEvent.event.custom_fields.subname;
+
+                        var cellStartTime = row.insertCell(3);
+                        cellStartTime.innerHTML = curEvent.start_time;
+
+                        var cellEndTime = row.insertCell(4);
+                        cellEndTime.innerHTML = curEvent.end_time;
+
+                        var cellDuration = row.insertCell(5);
+                        cellDuration.innerHTML = curEvent.event.duration;
+
+                        var cellProgramType = row.insertCell(6);
+                        cellProgramType.innerHTML = curEvent.event.custom_fields.program_type;
+
+                        var cellImage = row.insertCell(7);
+                        var imageElement = document.createElement("img");
+                        imageElement.src = curEvent.event.photo.urls.square_75;
+                        cellImage.appendChild(imageElement);
+
+                        var cellChannel = row.insertCell(8);
+                        cellChannel.innerHTML = curEvent.event.custom_fields.channel_id;
+
+                        var cellCountry = row.insertCell(9);
+                        cellCountry.innerHTML = curEvent.event.custom_fields.program_country;
+
+                        var cellProgramId = row.insertCell(10);
+                        cellProgramId.innerHTML = curEvent.event.custom_fields.program_id;
+
+                        var cellId = row.insertCell(11);
+                        cellId.innerHTML = curEvent.event.id;
+                    }
+                } else console.log('something wrong with meta.status: loadProgramsShowingNow');
+            } else console.log('something wrong with data.meta: loadProgramsShowingNow');
+        } else console.log('something wrong with data: loadProgramsShowingNow');
+    });
+}
+
+function insertChatMessage(message) {
+/*
+var senderObj = {id: message.senderId, fbId: message.senderFbId, imageUrl: 'https://graph.facebook.com/'+message.senderFbId+'/picture',time:message.time }
+                    var newChatRow = new ChatMessageTableViewRow(message.text,senderObj,false);
+                    chatMessagesTableView.appendRow(newChatRow);
+                    setTimeout(function() {
+                        chatMessagesTableView.scrollToIndex(chatMessagesTableView.data[0].rowCount - 1); //add some delay-fixing stuff here scroll to the latest row
+                    }, 1000);
+*/
+    console.log(message);
+    var table = document.getElementById('chatTable');
+    var rowCount = table.rows.length;
+    var row = table.insertRow(rowCount);
+
+    var cellUserId = row.insertCell(0);
+    cellUserId.innerHTML = message.senderId;
+
+    var cellUserFbId = row.insertCell(1);
+    cellUserFbId.innerHTML = message.senderFbId;
+
+    var cellImage = row.insertCell(2);
+    var imageElement = document.createElement("img");
+    imageElement.src = 'https://graph.facebook.com/'+message.senderFbId+'/picture';
+    cellImage.appendChild(imageElement);
+
+    var cellMessage = row.insertCell(3);
+    cellMessage.innerHTML = message.text;
 }

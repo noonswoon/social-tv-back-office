@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title> Chatterbox Lungbaan - Chat</title>
+		<script type="text/javascript" src="js/jquery/jquery-1.6.2.min.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery-ui-1.8.16.custom.min.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery.showLoading.js"></script>
+		<script type="text/javascript" src="http://sdk.cocoafish.com/js/cocoafish-1.2.min.js"></script>
+		<script type="text/javascript" src="js/parseuri.js"></script>
+		<script type="text/javascript" src="js/utils.js"></script>
+		<link type="text/css" href="css/cupertino/jquery-ui-1.8.8.custom.css" rel="Stylesheet" />
+		<link type="text/css" href="css/showLoading.css" rel="Stylesheet" />
+		
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('#sendButton').button({
+						icons: {
+	                			primary: "ui-icon-triangle-1-e",
+	                			secondary: "ui-icon-triangle-1-e"
+	            			}
+				});
+
+				var url = parseUri(window.location.toString());
+				var programId = url.queryKey['programId'];
+				alert('programId: '+programId);
+			});
+		</script>
+		
+		<style type="text/css">
+			body {
+				font-size:12px;
+			}
+			
+			.loginFormArea {
+				width:100%;
+				padding:15px;
+			}
+
+			.chatMessage {
+				width: 400px;
+			}
+
+			.chatRow {
+				text-align: left;
+			}
+
+		</style>
+	</head>
+	<body>
+	<div id="container">
+		<table align="center">
+			<tr>
+				<td>
+					<div>
+						<h2>Chat Module</h2>
+					</div>
+					<div id="mainArea" class="loginFormArea ui-widget ui-widget-content ui-corner-all">
+						<table id="chatTable" align="center" border="0" cellspacing="0" cellpadding="5">
+							<tr>
+								<td colspan="4">Total Chatters, enter chatroom</td>
+							</tr>
+							<tr class="chatRow">
+								<th>UserId</th>
+								<th>FbId</th>
+								<th>Pic</th>
+								<th class="chatMessage">Message</th>
+							</tr>
+							<tr class="chatRow">
+								<td>5004bbb600204417fb0d59c1</td>
+								<td>202852</td>
+								<td>
+									<img src="https://graph.facebook.com/202852/picture?type=square" />
+								</td>
+								<td class="chatMessage">Hello my friend!</td>
+							</tr>
+						</table>
+					</div>
+					<div id="enterArea">
+						<table>
+							<tr>
+								<td>
+									<textarea id="inputChat" cols="130" rows="5"></textarea>
+								</td>
+							</tr>
+							<tr>
+								<td align="center">
+									<a id="sendButton" href="javascript:void(0)">Send</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</td>
+			</tr>
+		</table>
+		</div>
+	</body>
+	<div pub-key="pub-5d5a8d08-52e1-4011-b632-da2a91d6a2b9" sub-key="sub-de622063-9eb3-11e1-8dea-0b2d0bf49bb9" ssl="off" origin="pubsub.pubnub.com" id="pubnub"></div>
+	<script src="http://cdn.pubnub.com/pubnub-3.1.min.js"></script>
+	<script>
+	(function(){
+	    // LISTEN FOR MESSAGES
+	    PUBNUB.subscribe({
+	        channel    : "CH3_DAYSW0",      // CONNECT TO THIS CHANNEL.
+	 
+	        restore    : false,              // STAY CONNECTED, EVEN WHEN BROWSER IS CLOSED
+	                                         // OR WHEN PAGE CHANGES.
+	 
+	        callback   : function(message) { // RECEIVED A MESSAGE.
+	            console.log(message);
+	            insertChatMessage(message);
+	        },
+	 
+	        disconnect : function() {        // LOST CONNECTION.
+	            console.log(
+	            	"Connection Lost." + "Will auto-reconnect when Online."
+	            );
+	        },
+	 
+	        reconnect  : function() {        // CONNECTION RESTORED.
+	            alert("And we're Back!")
+	        },
+	 
+	        connect    : function() {        // CONNECTION ESTABLISHED.
+	            PUBNUB.publish({             // SEND A MESSAGE.
+	                channel : "CH3_DAYSW0",
+	                message : "Hi from PubNub."
+	            })
+	        }
+	    })
+	})();
+	</script>
+</html>

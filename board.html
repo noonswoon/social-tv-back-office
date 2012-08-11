@@ -2,21 +2,21 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title> Chatterbox Lungbaan - Programs Now</title>
+		<title> Chatterbox Lungbaan - Message Board</title>
 		<script type="text/javascript" src="js/jquery/jquery-1.6.2.min.js"></script>
 		<script type="text/javascript" src="js/jquery/jquery-ui-1.8.16.custom.min.js"></script>
 		<script type="text/javascript" src="js/jquery/jquery.showLoading.js"></script>
 		<script type="text/javascript" src="http://sdk.cocoafish.com/js/cocoafish-1.2.min.js"></script>
-		<script type="text/javascript" src="js/moment.min.js"></script>
+		<script type="text/javascript" src="js/parseuri.js"></script>
 		<script type="text/javascript" src="js/utils.js"></script>
 		<link type="text/css" href="css/cupertino/jquery-ui-1.8.8.custom.css" rel="Stylesheet" />
 		<link type="text/css" href="css/showLoading.css" rel="Stylesheet" />
 		
 		<script type="text/javascript">
 			$(document).ready(function() {
-				var doo = {mickey:3,mouse:2};
-				
-				loadProgramsShowingNow();
+				var url = parseUri(window.location.toString());
+				var programId = url.queryKey['programId'];
+				alert('programId: '+programId);
 			});
 		</script>
 		
@@ -38,26 +38,16 @@
 			<tr>
 				<td>
 					<div>
-						<h2>Programs Showing Now</h2>
+						<h2>Message Board Module</h2>
 					</div>
 					<div id="mainArea" class="loginFormArea ui-widget ui-widget-content ui-corner-all">
-						<table id="programsNowTable" align="center" border="0" cellspacing="0" cellpadding="5">
+						<table align="center" border="0" cellspacing="0" cellpadding="5">
 							<tr>
-								<th>Actions</th>
-								<th>Program Name</th>
-								<th>Subname</th>
-								<th>StartTime</th>
-								<th>EndTime</th>
-								<th>Duration (sec)</th>
-								<th>Program Type</th>
-								<th>Photo</th>
-								<th>Channel</th>
-								<th>Country</th>
-								<th>Program Meta Id</th>
-								<th>Id</th>
+								<td>Total Topics</td>
 							</tr>
 						</table>
 					</div>
+					
 				</td>
 			</tr>
 		</table>
