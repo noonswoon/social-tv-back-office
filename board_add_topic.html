@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title> Chatterbox Lungbaan - Message Board</title>
+		<title> Chatterbox Lungbaan - Add New Board Topic</title>
 		<script type="text/javascript" src="js/jquery/jquery-1.6.2.min.js"></script>
 		<script type="text/javascript" src="js/jquery/jquery-ui-1.8.16.custom.min.js"></script>
 		<script type="text/javascript" src="js/jquery/jquery.showLoading.js"></script>
@@ -17,18 +17,22 @@
 				var url = parseUri(window.location.toString());
 				var programId = url.queryKey['programId'];
 				loadProgramInfo(programId);
-				loadTopicsOfProgramId(programId);
-				
-				$('#addTopicButton').button({
-					icons: {
-	               		primary: "ui-icon-triangle-1-e",
-	               		secondary: "ui-icon-triangle-1-e"
-	            	}
+
+				$('#createButton').click(function() {
+					console.log('create button is clicked');
+					console.log($('#titleText').val());
+					console.log($('#contentText').val());
+					console.log($('#pictureFile').val());
+					
+					//not including picture
+					createTopic({ 
+						'title': $('#titleText').val(),
+						'content': $('#contentText').val(),
+						'programId': programId
+					});
+					return false;
 				});
 
-				$('#addTopicButton').click(function() {
-					window.location = 'board_add_topic.html?programId='+programId;		
-				});
 			});
 		</script>
 		
@@ -50,28 +54,35 @@
 			<tr>
 				<td>
 					<div>
-						<h2>Message Board Module</h2>
+						<h2>Message Board Module - Add New Topic</h2>
 					</div>
 					<div>
 						<h3>
 							Program Id: <span id="programId"></span><br />
 							Program Name: <span id="programName"></span><br />
-							Total topics: <span id="totalTopics"></span>
 						</h3>
-						<a id="addTopicButton" href="javascript:void(0)">Add New Topic</a>
 					</div><br />
 					<div id="mainArea" class="loginFormArea ui-widget ui-widget-content ui-corner-all">
-						<table id="topicsTable" align="center" border="0" cellspacing="0" cellpadding="5">
-							<tr>
-								<th>Details</th>
-								<th># Comments</th>
-								<th>Topics</th>
-								<th>Content</th>
-								<th>time</th>
-								<th>by username</th>
-							</tr>
-							<!-- space for adding contents dynamically -->
-						</table>
+						<form id="addTopicForm">
+							<table align="center" border="0" cellspacing="0" cellpadding="5">
+								<tr>
+									<td>Title</td>
+									<td><textarea id="titleText" cols="30" rows="2"></textarea></td>
+								</tr>
+								<tr>
+									<td>Content</td>
+									<td><textarea id="contentText" cols="30" rows="2"></textarea></td>
+								</tr>
+								<tr>
+									<td>Picture (if any)</td>
+									<td><input id="pictureFile" type="file" /></td>
+								</tr>
+								<tr>
+									<td><button id="createButton">Create A Topic</button></td>
+									<td></td>
+								</tr>
+							</table>
+						</form>
 					</div>
 				</td>
 			</tr>

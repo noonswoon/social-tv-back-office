@@ -429,3 +429,23 @@ function loadTopicsOfProgramId(_programId) {
         } else console.log('something wrong with data: loadTopicsOfProgramId');
     });
 }
+
+function createTopic(_topicObj) {
+    var data = {
+        title: _topicObj.title,
+        content: _topicObj.content,
+        custom_fields: '{"program_id": "'+_topicObj.programId+'", "local_id": -1, "is_deleted":0}'
+    };
+    sdk.sendRequest('posts/create.json', 'POST', data, function(data) {
+        if(data) {
+            if(data.meta) {
+                var meta = data.meta;
+                console.log(data);
+                if(meta.status == 'ok' && meta.code == 200 && meta.method_name == 'createPost') {
+                    var posts = data.response.posts;
+                    console.log(posts);
+                } else console.log('something wrong with meta.status: createTopic');
+            } else console.log('something wrong with data.meta: createTopic');
+        } else console.log('something wrong with data: createTopic');
+    });
+}
