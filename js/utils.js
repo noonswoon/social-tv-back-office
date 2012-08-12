@@ -25,12 +25,17 @@ sdk.oauthSecret = acsOAuthSecret;
 
 // Sign up at http://cocoafish.com and create an app.
 var userId;
+var userFbId; 
 
-function loginUser(userLogin, passwd) {
+function loginUser(_userLogin, _passwd) {
     $('#container').showLoading();
-    sdk.sendRequest('users/login.json', 'POST', {login:userLogin, password: passwd}, function(responseData) {
+    sdk.sendRequest('users/login.json', 'POST', {login:_userLogin, password: _passwd}, function(responseData) {
         if(responseData && responseData.meta && responseData.meta.code == 200) {
-            window.location = 'places.html';
+            //console.log(responseData);
+            localStorage.setItem("userId", responseData.response.users[0].id); 
+            localStorage.setItem("userFbId", responseData.response.users[0].external_accounts[0].external_id);
+            //console.log('userId: '+userId+', userFbId: '+userFbId);
+            window.location = 'main.html';
         } else {
             alert(responseData.meta.message);
             $('#container').hideLoading();
@@ -331,31 +336,108 @@ function loadProgramsShowingNow() {
     });
 }
 
-function insertChatMessage(message) {
-/*
-var senderObj = {id: message.senderId, fbId: message.senderFbId, imageUrl: 'https://graph.facebook.com/'+message.senderFbId+'/picture',time:message.time }
-                    var newChatRow = new ChatMessageTableViewRow(message.text,senderObj,false);
-                    chatMessagesTableView.appendRow(newChatRow);
-                    setTimeout(function() {
-                        chatMessagesTableView.scrollToIndex(chatMessagesTableView.data[0].rowCount - 1); //add some delay-fixing stuff here scroll to the latest row
-                    }, 1000);
-*/
-    console.log(message);
+function insertChatMessage(_message) {
     var table = document.getElementById('chatTable');
-    var rowCount = table.rows.length;
-    var row = table.insertRow(rowCount);
+//    var rowCount = table.rows.length;
+    var row = table.insertRow(2); //insert after header and total num chatters row
 
     var cellUserId = row.insertCell(0);
-    cellUserId.innerHTML = message.senderId;
+    cellUserId.innerHTML = _message.senderId;
 
     var cellUserFbId = row.insertCell(1);
-    cellUserFbId.innerHTML = message.senderFbId;
+    cellUserFbId.innerHTML = _message.senderFbId;
 
     var cellImage = row.insertCell(2);
     var imageElement = document.createElement("img");
-    imageElement.src = 'https://graph.facebook.com/'+message.senderFbId+'/picture';
+    imageElement.src = 'https://graph.facebook.com/'+_message.senderFbId+'/picture';
     cellImage.appendChild(imageElement);
 
-    var cellMessage = row.insertCell(3);
-    cellMessage.innerHTML = message.text;
+    var cellTime = row.insertCell(3);
+    cellTime.innerHTML = _message.time;
+
+    var cellMessage = row.insertCell(4);
+    cellMessage.innerHTML = _message.text;
+}
+
+function loadTopicsOfProgramId(_programId) {
+    var data = {
+        where: '{"program_id":"'+_programId+'"}',
+        page: 1, 
+        per_page: 100,
+        response_json_depth: 2,
+        order: '-created_at'
+    };
+    sdk.sendRequest('posts/query.json', 'GET', data, function(data) {
+        if(data) {
+            if(data.meta) {
+                var meta = data.meta;
+                if(meta.status == 'ok' && meta.code == 200 && meta.method_name == 'queryPosts') {
+                    var posts = data.response.posts;
+                    console.log(posts);
+
+                    var table = document.getElementById('topicsTable');
+
+                    for(var i=0; i < posts.length; i++) {
+                        var curPost = posts[i];
+                        var rowCount = table.rows.length;
+                        var row = table.insertRow(rowCount);
+
+                        var cellDetails = row.insertCell(0);
+                        cellDetails.innerHTML = '<a href="comment.html?topicId='+curPost.id+'">details</a>';
+
+                        var cellNumComments = row.insertCell(1);
+                        cellNumComments.innerHTML = curPost.reviews_count;
+
+                        var cellTopic = row.insertCell(2);
+                        cellTopic.innerHTML = curPost.title;
+
+                        var cellContent = row.insertCell(3);
+                        cellContent.innerHTML = curPost.content;
+
+                        var cellTime = row.insertCell(4);
+                        cellTime.innerHTML = curPost.updated_at;
+                        
+                        var cellUser = row.insertCell(5);
+                        cellUser.innerHTML = curPost.user.username;
+                    }
+                } else console.log('something wrong with meta.status: loadTopicsOfProgramId');
+            } else console.log('something wrong with data.meta: loadTopicsOfProgramId');
+        } else console.log('something wrong with data: loadTopicsOfProgramId');
+    });
+
+    /* 
+    Cloud.Posts.query({
+        page: messageboardACSPageIndex,
+        per_page: 10,
+        where: {
+            program_id: programId
+        }, 
+        order: '-created_at',
+        response_json_depth: 2
+    }, function (e) {
+        if (e.success) {
+            for (var i = 0; i < e.posts.length; i++) {
+                var post = e.posts[i];
+                var numComments = 0; 
+                if(post.reviews_count !== undefined)
+                    numComments = post.reviews_count;
+                var curTopic = {
+                    id: post.id,
+                    programId: programId,
+                    title: post.title,
+                    content: post.content,
+                    photo: post.photo,
+                    user:post.user,         
+                    commentsCount: numComments,
+                    isDeleted: post.custom_fields.is_deleted,
+                    updatedAt: post.updated_at
+                }
+                topicsOfProgram.push(curTopic);
+            }
+            Ti.App.fireEvent("topicsLoadedComplete",{topicsOfProgram:topicsOfProgram});
+        } else {
+            Debug.debug_print('topicACS_fetchAllTopicsOfProgramId Error: ' + JSON.stringify(e));
+            ErrorHandling.showNetworkError();
+        }
+    */
 }

@@ -16,7 +16,7 @@
 			$(document).ready(function() {
 				var url = parseUri(window.location.toString());
 				var programId = url.queryKey['programId'];
-				alert('programId: '+programId);
+				loadTopicsOfProgramId(programId);
 			});
 		</script>
 		
@@ -34,20 +34,32 @@
 	</head>
 	<body>
 	<div id="container">
-		<table align="center">
+		<table align="left">
 			<tr>
 				<td>
 					<div>
 						<h2>Message Board Module</h2>
 					</div>
+					<div>
+						<h3>
+							Program Id: <span id="programId">CH3_OYMPC</span><br />
+							Program Name: <span id="programName">Olympics 2012</span><br />
+							Total topics: <span id="totalTopics">43</span>
+						</h3>
+					</div>
 					<div id="mainArea" class="loginFormArea ui-widget ui-widget-content ui-corner-all">
-						<table align="center" border="0" cellspacing="0" cellpadding="5">
+						<table id="topicsTable" align="center" border="0" cellspacing="0" cellpadding="5">
 							<tr>
-								<td>Total Topics</td>
+								<th>Details</th>
+								<th># Comments</th>
+								<th>Topics</th>
+								<th>Content</th>
+								<th>time</th>
+								<th>by username</th>
 							</tr>
+							<!-- space for adding contents dynamically -->
 						</table>
 					</div>
-					
 				</td>
 			</tr>
 		</table>

@@ -8,12 +8,18 @@
 		<script type="text/javascript" src="js/jquery/jquery.showLoading.js"></script>
 		<script type="text/javascript" src="http://sdk.cocoafish.com/js/cocoafish-1.2.min.js"></script>
 		<script type="text/javascript" src="js/parseuri.js"></script>
+		<script type="text/javascript" src="js/moment.min.js"></script>
 		<script type="text/javascript" src="js/utils.js"></script>
 		<link type="text/css" href="css/cupertino/jquery-ui-1.8.8.custom.css" rel="Stylesheet" />
 		<link type="text/css" href="css/showLoading.css" rel="Stylesheet" />
 		
 		<script type="text/javascript">
 			$(document).ready(function() {
+				if(	localStorage.getItem("userId") === null ||
+					localStorage.getItem("userFbId") === null
+					)
+					window.location = 'login.html';
+
 				$('#sendButton').button({
 						icons: {
 	                			primary: "ui-icon-triangle-1-e",
@@ -23,7 +29,22 @@
 
 				var url = parseUri(window.location.toString());
 				var programId = url.queryKey['programId'];
-				alert('programId: '+programId);
+				
+				$('#sendButton').click(function() {
+					var inputChat = $.trim($('#inputChat').val());
+					if(inputChat !== "") {
+				        PUBNUB.publish({
+				            channel  : programId,
+				            message  : { 	text : inputChat, 
+				            				senderId: localStorage.getItem("userId"), 
+				            				senderFbId: localStorage.getItem("userFbId"), 
+				            				time: moment().format('YYYY-MM-DD, HH:mm:ss')
+				            			}
+				        });
+						$('#inputChat').val("");
+					}
+
+				});
 			});
 		</script>
 		
@@ -55,6 +76,20 @@
 					<div>
 						<h2>Chat Module</h2>
 					</div>
+					<div id="enterArea">
+						<table>
+							<tr>
+								<td>
+									<textarea id="inputChat" cols="50" rows="5"></textarea>
+								</td>
+							</tr>
+							<tr>
+								<td align="right">
+									<a id="sendButton" href="javascript:void(0)">Send</a>
+								</td>
+							</tr>
+						</table>
+					</div>
 					<div id="mainArea" class="loginFormArea ui-widget ui-widget-content ui-corner-all">
 						<table id="chatTable" align="center" border="0" cellspacing="0" cellpadding="5">
 							<tr>
@@ -64,6 +99,7 @@
 								<th>UserId</th>
 								<th>FbId</th>
 								<th>Pic</th>
+								<th>Time</th>
 								<th class="chatMessage">Message</th>
 							</tr>
 							<tr class="chatRow">
@@ -72,21 +108,8 @@
 								<td>
 									<img src="https://graph.facebook.com/202852/picture?type=square" />
 								</td>
+								<td>2012-08-12, 14:33:43</td>
 								<td class="chatMessage">Hello my friend!</td>
-							</tr>
-						</table>
-					</div>
-					<div id="enterArea">
-						<table>
-							<tr>
-								<td>
-									<textarea id="inputChat" cols="130" rows="5"></textarea>
-								</td>
-							</tr>
-							<tr>
-								<td align="center">
-									<a id="sendButton" href="javascript:void(0)">Send</a>
-								</td>
 							</tr>
 						</table>
 					</div>
@@ -99,15 +122,17 @@
 	<script src="http://cdn.pubnub.com/pubnub-3.1.min.js"></script>
 	<script>
 	(function(){
+		var url = parseUri(window.location.toString());		
+		var programId = url.queryKey['programId'];
+				
 	    // LISTEN FOR MESSAGES
 	    PUBNUB.subscribe({
-	        channel    : "CH3_DAYSW0",      // CONNECT TO THIS CHANNEL.
+	        channel    : programId,      // CONNECT TO THIS CHANNEL.
 	 
 	        restore    : false,              // STAY CONNECTED, EVEN WHEN BROWSER IS CLOSED
 	                                         // OR WHEN PAGE CHANGES.
 	 
 	        callback   : function(message) { // RECEIVED A MESSAGE.
-	            console.log(message);
 	            insertChatMessage(message);
 	        },
 	 
@@ -118,14 +143,11 @@
 	        },
 	 
 	        reconnect  : function() {        // CONNECTION RESTORED.
-	            alert("And we're Back!")
+	            console.log("And we're Back!")
 	        },
 	 
 	        connect    : function() {        // CONNECTION ESTABLISHED.
-	            PUBNUB.publish({             // SEND A MESSAGE.
-	                channel : "CH3_DAYSW0",
-	                message : "Hi from PubNub."
-	            })
+	            console.log('connected to chatroom '+programId+'...');
 	        }
 	    })
 	})();
