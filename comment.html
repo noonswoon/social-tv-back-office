@@ -16,7 +16,6 @@
 			$(document).ready(function() {
 				var url = parseUri(window.location.toString());
 				var programId = url.queryKey['programId'];
-				loadProgramInfo(programId);
 				loadTopicsOfProgramId(programId);
 			});
 		</script>
@@ -43,9 +42,9 @@
 					</div>
 					<div>
 						<h3>
-							Program Id: <span id="programId"></span><br />
-							Program Name: <span id="programName"></span><br />
-							Total topics: <span id="totalTopics"></span>
+							Program Id: <span id="programId">CH3_OYMPC</span><br />
+							Program Name: <span id="programName">Olympics 2012</span><br />
+							Total topics: <span id="totalTopics">43</span>
 						</h3>
 					</div>
 					<div id="mainArea" class="loginFormArea ui-widget ui-widget-content ui-corner-all">

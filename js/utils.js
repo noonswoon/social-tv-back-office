@@ -359,6 +359,30 @@ function insertChatMessage(_message) {
     cellMessage.innerHTML = _message.text;
 }
 
+function loadProgramInfo(_programId) {
+
+    var data = {
+        where: '{"program_id":"'+_programId+'"}',
+        page: 1, 
+        per_page: 1,
+        response_json_depth: 2,
+        order: '-created_at'
+    };
+    sdk.sendRequest('events/query.json', 'GET', data, function(data) {
+        if(data) {
+            if(data.meta) {
+                var meta = data.meta;
+                if(meta.status == 'ok' && meta.code == 200 && meta.method_name == 'queryEvents') {
+                    var events = data.response.events;
+                    console.log(events);
+                    $('#programId').html(events[0].custom_fields.program_id);
+                    $('#programName').html(events[0].name);
+                } else console.log('something wrong with meta.status: loadProgramInfo');
+            } else console.log('something wrong with data.meta: loadProgramInfo');
+        } else console.log('something wrong with data: loadProgramInfo');
+    });
+}
+
 function loadTopicsOfProgramId(_programId) {
     var data = {
         where: '{"program_id":"'+_programId+'"}',
@@ -372,9 +396,9 @@ function loadTopicsOfProgramId(_programId) {
             if(data.meta) {
                 var meta = data.meta;
                 if(meta.status == 'ok' && meta.code == 200 && meta.method_name == 'queryPosts') {
-                    var posts = data.response.posts;
-                    console.log(posts);
 
+                    $('#totalTopics').html(meta.total_results);
+                    var posts = data.response.posts;
                     var table = document.getElementById('topicsTable');
 
                     for(var i=0; i < posts.length; i++) {
@@ -404,40 +428,4 @@ function loadTopicsOfProgramId(_programId) {
             } else console.log('something wrong with data.meta: loadTopicsOfProgramId');
         } else console.log('something wrong with data: loadTopicsOfProgramId');
     });
-
-    /* 
-    Cloud.Posts.query({
-        page: messageboardACSPageIndex,
-        per_page: 10,
-        where: {
-            program_id: programId
-        }, 
-        order: '-created_at',
-        response_json_depth: 2
-    }, function (e) {
-        if (e.success) {
-            for (var i = 0; i < e.posts.length; i++) {
-                var post = e.posts[i];
-                var numComments = 0; 
-                if(post.reviews_count !== undefined)
-                    numComments = post.reviews_count;
-                var curTopic = {
-                    id: post.id,
-                    programId: programId,
-                    title: post.title,
-                    content: post.content,
-                    photo: post.photo,
-                    user:post.user,         
-                    commentsCount: numComments,
-                    isDeleted: post.custom_fields.is_deleted,
-                    updatedAt: post.updated_at
-                }
-                topicsOfProgram.push(curTopic);
-            }
-            Ti.App.fireEvent("topicsLoadedComplete",{topicsOfProgram:topicsOfProgram});
-        } else {
-            Debug.debug_print('topicACS_fetchAllTopicsOfProgramId Error: ' + JSON.stringify(e));
-            ErrorHandling.showNetworkError();
-        }
-    */
 }
